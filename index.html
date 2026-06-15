@@ -198,6 +198,23 @@
     }
     input::placeholder { color: #bbb; }
 
+    /* ── LOCKED FIELD (předvyplněno z odkazu) ─────── */
+    select:disabled {
+      background-color: #f4f0ec;
+      color: #1a1a1a;
+      border-color: #e0d9d2;
+      border-style: dashed;
+      cursor: default;
+      background-image: none;
+      padding-right: 0.8rem;
+      opacity: 1;
+    }
+    .locked-hint {
+      font-size: 0.72rem;
+      color: #aaa;
+      margin-top: 0.35rem;
+    }
+
     /* ── RADIO CARDS ─────────────────────────────── */
     .radio-group { display: flex; flex-direction: column; gap: 0.45rem; }
 
@@ -563,18 +580,7 @@
         <div class="field">
           <label>Preferovaný den výuky <span class="req">*</span></label>
           <div class="radio-group" id="dayGroup">
-            <label class="radio-option">
-              <input type="radio" name="preferredDay" value="středa" required />
-              <span id="labelWed">Středa</span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="preferredDay" value="čtvrtek" />
-              <span id="labelThu">Čtvrtek</span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="preferredDay" value="mohu oba možné dny" />
-              <span>Mohu oba možné dny</span>
-            </label>
+            <p style="font-size:0.84rem;color:#999;line-height:1.6;">Nejprve vyberte město kurzu.</p>
           </div>
         </div>
       </div>
@@ -763,10 +769,15 @@
     document.getElementById("prihlaskaForm").style.display = "none";
     document.getElementById("accessNotice").style.display = "block";
   } else {
-    // Předvyplnění města kurzu podle pobočky z URL
+    // Předvyplnění města kurzu podle pobočky z URL – pole je uzamčené
     const courseCity = document.getElementById("courseCity");
     if (Array.from(courseCity.options).some(o => o.value === POBOCKA)) {
       courseCity.value = POBOCKA;
+      courseCity.disabled = true;
+      const hint = document.createElement("div");
+      hint.className = "locked-hint";
+      hint.textContent = "Nastaveno podle vašeho odkazu.";
+      courseCity.insertAdjacentElement("afterend", hint);
     }
   }
 
@@ -781,17 +792,50 @@
     list.appendChild(div);
   });
 
-  const courseTimes = {
-    "Ideální střední cesta": { wed: "Středa  16:00–18:35", thu: "Čtvrtek  16:00–18:35" },
-    "Solidní základ":        { wed: "Středa  17:05–18:35", thu: "Čtvrtek  17:05–18:35" },
-    "Beru to vážně!":        { wed: "Středa  16:00–18:35", thu: "Čtvrtek  16:00–18:35" },
+  // ── Dny a časy výuky podle města (nezávisle na typu kurzu) ──
+  const cityConfig = {
+    "Příbram": { days: ["Středa", "Čtvrtek"], time: "16:00–18:35" },
+    "Beroun":  { days: ["Středa", "Čtvrtek"], time: "16:10–18:45" },
+    "Plzeň":   { days: ["Úterý", "Středa"],   time: "16:00–18:35" },
+    "Kladno":  { days: ["Středa", "Čtvrtek"], time: "17:05–18:35" },
+    "Praha":   { days: ["Středa", "Čtvrtek"], time: "17:05–18:35" },
   };
 
-  document.getElementById("courseType").addEventListener("change", function () {
-    const t = courseTimes[this.value];
-    document.getElementById("labelWed").textContent = t ? t.wed : "Středa";
-    document.getElementById("labelThu").textContent = t ? t.thu : "Čtvrtek";
+  const dayGroup = document.getElementById("dayGroup");
+
+  function renderDays(city) {
+    const cfg = cityConfig[city];
+    dayGroup.innerHTML = "";
+
+    if (!cfg) {
+      dayGroup.innerHTML =
+        '<p style="font-size:0.84rem;color:#999;line-height:1.6;">Nejprve vyberte město kurzu.</p>';
+      return;
+    }
+
+    cfg.days.forEach((day, i) => {
+      const label = document.createElement("label");
+      label.className = "radio-option";
+      label.innerHTML =
+        `<input type="radio" name="preferredDay" value="${day.toLowerCase()}" ${i === 0 ? "required" : ""} />` +
+        `<span>${day} ${cfg.time}</span>`;
+      dayGroup.appendChild(label);
+    });
+
+    const both = document.createElement("label");
+    both.className = "radio-option";
+    both.innerHTML =
+      `<input type="radio" name="preferredDay" value="mohu oba možné dny" />` +
+      `<span>Mohu oba možné dny</span>`;
+    dayGroup.appendChild(both);
+  }
+
+  document.getElementById("courseCity").addEventListener("change", function () {
+    renderDays(this.value);
   });
+
+  // Inicializace dnů podle předvyplněného města (z URL ?pobocka=)
+  renderDays(document.getElementById("courseCity").value);
 
   // ── Slevový kód: validace ───────────────────────────────
   const VALID_CODES   = ["F3TP3P3", "K0BM5M0"];
