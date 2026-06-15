@@ -334,6 +334,29 @@
       line-height: 1.5;
     }
 
+    /* ── CODE FEEDBACK ───────────────────────────── */
+    .code-feedback {
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-top: 0.4rem;
+      line-height: 1.4;
+      min-height: 1rem;
+    }
+    .code-feedback.valid   { color: #15803d; }
+    .code-feedback.invalid { color: #c0392b; }
+
+    input.input-valid {
+      border-color: #15803d !important;
+      background: #f0fdf4 !important;
+    }
+    input.input-valid:focus {
+      box-shadow: 0 0 0 3px rgba(21,128,61,0.10) !important;
+    }
+    input.input-invalid {
+      border-color: #c0392b !important;
+      background: #fef2f2 !important;
+    }
+
     /* ── ERROR ───────────────────────────────────── */
     .error-msg {
       display: none;
@@ -558,10 +581,26 @@
 
       <hr class="divider" />
 
-      <!-- ── 4. FAKTURAČNÍ ÚDAJE ────────────────────── -->
+      <!-- ── 4. SLEVOVÝ KÓD ─────────────────────────── -->
       <div class="section">
         <div class="section-header">
           <div class="section-num">4</div>
+          <div class="section-title">Slevový kód <span class="section-sub">nepovinné</span></div>
+        </div>
+
+        <div class="field">
+          <label for="discountCode">Máte slevový kód? <span class="opt">(nepovinné)</span></label>
+          <input type="text" id="discountCode" name="discountCode" placeholder="Zadejte kód" autocomplete="off" autocapitalize="characters" />
+          <div class="code-feedback" id="discountFeedback"></div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- ── 5. FAKTURAČNÍ ÚDAJE ────────────────────── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-num">5</div>
           <div class="section-title">Fakturační údaje <span class="section-sub">pouze při fakturaci na firmu</span></div>
         </div>
 
@@ -584,10 +623,10 @@
 
       <hr class="divider" />
 
-      <!-- ── 5. KAMARÁDI ───────────────────────────── -->
+      <!-- ── 6. KAMARÁDI ───────────────────────────── -->
       <div class="section">
         <div class="section-header">
-          <div class="section-num">5</div>
+          <div class="section-num">6</div>
           <div class="section-title">Kamarádi <span class="section-sub">nepovinné</span></div>
         </div>
 
@@ -613,10 +652,10 @@
 
       <hr class="divider" />
 
-      <!-- ── 6. SOUHLASY ───────────────────────────── -->
+      <!-- ── 7. SOUHLASY ───────────────────────────── -->
       <div class="section">
         <div class="section-header">
-          <div class="section-num">6</div>
+          <div class="section-num">7</div>
           <div class="section-title">Podmínky a souhlasy</div>
         </div>
 
@@ -711,7 +750,7 @@
 </div>
 
 <script>
-  const WEBHOOK_URL = "https://n8n-production-7161.up.railway.app/webhook/prihlaska";
+  const WEBHOOK_URL = "https://n8n-production-9b68.up.railway.app/webhook-test/prihlaska";
 
   // Token a pobočka z URL – vloženy emailem z Flow 2 (?token=UUID&pobocka=Beroun)
   const params  = new URLSearchParams(window.location.search);
@@ -754,16 +793,66 @@
     document.getElementById("labelThu").textContent = t ? t.thu : "Čtvrtek";
   });
 
+  // ── Slevový kód: validace ───────────────────────────────
+  const VALID_CODES   = ["F3TP3P3", "K0BM5M0"];
+  const discountInput = document.getElementById("discountCode");
+  const discountFeedback = document.getElementById("discountFeedback");
+
+  // Normalizace kódu (velká písmena, bez mezer)
+  function normalizeCode(v) {
+    return v.toUpperCase().replace(/\s+/g, "");
+  }
+
+  // Vrací: "empty" | "valid" | "invalid"
+  function discountState() {
+    const code = normalizeCode(discountInput.value);
+    if (!code) return "empty";
+    return VALID_CODES.includes(code) ? "valid" : "invalid";
+  }
+
+  function renderDiscountFeedback() {
+    const state = discountState();
+    discountInput.classList.remove("input-valid", "input-invalid");
+    discountFeedback.classList.remove("valid", "invalid");
+    if (state === "valid") {
+      discountInput.classList.add("input-valid");
+      discountFeedback.classList.add("valid");
+      discountFeedback.textContent = "✓ Slevový kód je platný.";
+    } else if (state === "invalid") {
+      discountInput.classList.add("input-invalid");
+      discountFeedback.classList.add("invalid");
+      discountFeedback.textContent = "✗ Tento slevový kód neplatí.";
+    } else {
+      discountFeedback.textContent = "";
+    }
+  }
+
+  discountInput.addEventListener("input", renderDiscountFeedback);
+  discountInput.addEventListener("blur", function () {
+    // Při opuštění pole kód zarovnáme na velká písmena bez mezer
+    if (discountInput.value) discountInput.value = normalizeCode(discountInput.value);
+    renderDiscountFeedback();
+  });
+
   document.getElementById("prihlaskaForm").addEventListener("submit", async function (e) {
     e.preventDefault();
 
     const btn      = document.getElementById("submitBtn");
     const errorMsg = document.getElementById("errorMsg");
     errorMsg.style.display = "none";
+
+    // Vyplněný, ale neplatný slevový kód blokuje odeslání
+    if (discountState() === "invalid") {
+      renderDiscountFeedback();
+      discountInput.focus();
+      return;
+    }
+
     btn.disabled = true;
     btn.textContent = "Odesílám…";
 
     const checkedDay = document.querySelector('input[name="preferredDay"]:checked');
+    const discountCode = normalizeCode(discountInput.value);
 
     const data = {
       guardianFirstName: document.getElementById("guardianFirstName").value.trim(),
@@ -786,6 +875,8 @@
       dic:               document.getElementById("dic").value.trim(),
       friends:           Array.from(document.querySelectorAll(".friend-input"))
                            .map(i => i.value.trim()).filter(Boolean).join(", "),
+      discountCode:      discountCode,
+      discountValid:     discountCode ? VALID_CODES.includes(discountCode) : false,
       token:             TOKEN,
       pobocka:           POBOCKA,
     };
