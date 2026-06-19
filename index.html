@@ -603,36 +603,10 @@
 
       <hr class="divider" />
 
-      <!-- ── 5. FAKTURAČNÍ ÚDAJE ────────────────────── -->
+      <!-- ── 5. KAMARÁDI ───────────────────────────── -->
       <div class="section">
         <div class="section-header">
           <div class="section-num">5</div>
-          <div class="section-title">Fakturační údaje <span class="section-sub">pouze při fakturaci na firmu</span></div>
-        </div>
-
-        <div class="field">
-          <label for="companyName">Název firmy <span class="opt">(nepovinné)</span></label>
-          <input type="text" id="companyName" name="companyName" placeholder="ABC s.r.o." />
-        </div>
-
-        <div class="row">
-          <div class="field">
-            <label for="ico">IČO <span class="opt">(nepovinné)</span></label>
-            <input type="text" id="ico" name="ico" placeholder="12345678" />
-          </div>
-          <div class="field">
-            <label for="dic">DIČ <span class="opt">(nepovinné)</span></label>
-            <input type="text" id="dic" name="dic" placeholder="CZ12345678" />
-          </div>
-        </div>
-      </div>
-
-      <hr class="divider" />
-
-      <!-- ── 6. KAMARÁDI ───────────────────────────── -->
-      <div class="section">
-        <div class="section-header">
-          <div class="section-num">6</div>
           <div class="section-title">Kamarádi <span class="section-sub">nepovinné</span></div>
         </div>
 
@@ -661,7 +635,7 @@
       <!-- ── 7. SOUHLASY ───────────────────────────── -->
       <div class="section">
         <div class="section-header">
-          <div class="section-num">7</div>
+          <div class="section-num">6</div>
           <div class="section-title">Podmínky a souhlasy</div>
         </div>
 
@@ -797,8 +771,8 @@
     "Příbram": { days: ["Středa", "Čtvrtek"], time: "16:00–18:35" },
     "Beroun":  { days: ["Středa", "Čtvrtek"], time: "16:10–18:45" },
     "Plzeň":   { days: ["Úterý", "Středa"],   time: "16:00–18:35" },
-    "Kladno":  { days: ["Středa", "Čtvrtek"], time: "17:05–18:35" },
-    "Praha":   { days: ["Středa", "Čtvrtek"], time: "17:05–18:35" },
+    "Kladno":  { days: ["Středa", "Čtvrtek"], time: "– čas upřesníme" },
+    "Praha":   { days: ["Středa", "Čtvrtek"], time: "16:00–18:35" },
   };
 
   const dayGroup = document.getElementById("dayGroup");
@@ -914,9 +888,6 @@
       courseType:        document.getElementById("courseType").value,
       courseCity:        document.getElementById("courseCity").value,
       preferredDay:      checkedDay ? checkedDay.value : "",
-      companyName:       document.getElementById("companyName").value.trim(),
-      ico:               document.getElementById("ico").value.trim(),
-      dic:               document.getElementById("dic").value.trim(),
       friends:           Array.from(document.querySelectorAll(".friend-input"))
                            .map(i => i.value.trim()).filter(Boolean).join(", "),
       discountCode:      discountCode,
