@@ -383,8 +383,10 @@
       padding: 0.75rem 1rem;
       border-radius: 8px;
       font-size: 0.85rem;
+      line-height: 1.6;
       margin-top: 0.75rem;
     }
+    .error-msg a { color: #b91c1c; font-weight: 600; }
 
     /* ── SUCCESS ─────────────────────────────────── */
     .success {
@@ -405,6 +407,75 @@
     .access-notice img { width: 100px; margin-bottom: 1.25rem; }
     .access-notice h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.02em; color: #c0392b; }
     .access-notice p { color: #666; font-size: 0.9rem; line-height: 1.6; }
+
+    /* ── DONE NOTICE (již odesláno) ──────────────── */
+    .done-notice {
+      display: none;
+      text-align: center;
+      padding: 2.75rem 1.5rem 3rem;
+    }
+    .done-notice .done-illu {
+      width: 150px;
+      height: auto;
+      margin-bottom: 1.5rem;
+    }
+    .done-notice h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.02em;
+    }
+    .done-notice p {
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+    .done-meta {
+      display: inline-flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.35rem 0.75rem;
+      background: #f7f4f1;
+      border: 1px solid #e8e2db;
+      border-radius: 10px;
+      padding: 0.6rem 1rem;
+      margin-top: 1.25rem;
+      font-size: 0.83rem;
+      color: #666;
+    }
+    .done-meta[hidden] { display: none; }
+    .done-meta strong { color: #1a1a1a; font-weight: 600; }
+    .done-meta span:empty { display: none; }
+    .done-meta span:not(:empty) + span:not(:empty)::before {
+      content: "·";
+      color: #c9c1b9;
+      margin-right: 0.55rem;
+    }
+    .done-next {
+      background: #fdf6f5;
+      border: 1.5px solid #f0d0ce;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin: 1.5rem auto 0;
+      max-width: 430px;
+      text-align: left;
+    }
+    .done-next-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #c0392b;
+      margin-bottom: 0.4rem;
+    }
+    .done-next p { font-size: 0.855rem; color: #444; line-height: 1.65; }
+    .done-contact {
+      font-size: 0.8rem;
+      color: #aaa;
+      line-height: 1.6;
+      margin-top: 1.25rem;
+    }
+    .done-contact a { color: #c0392b; text-decoration: none; }
 
     /* ── FOOTER ──────────────────────────────────── */
     .form-footer {
@@ -681,7 +752,9 @@
       <!-- ── SUBMIT ──────────────────────────────── -->
       <div class="submit-area">
         <div class="error-msg" id="errorMsg">
-          Omlouváme se, odeslání se nezdařilo. Zkuste to prosím znovu nebo nás kontaktujte na info@cervenapanda.com.
+          Omlouváme se, odeslání se nezdařilo. Zkuste to prosím znovu — pokud to nepomůže,
+          zavolejte nám na <a href="tel:+420721964682">+420 721 964 682</a>
+          nebo napište na <a href="mailto:info@cervenapanda.com">info@cervenapanda.com</a>.
         </div>
         <button type="submit" id="submitBtn">Odeslat přihlášku →</button>
         <p class="submit-note">
@@ -701,7 +774,10 @@
       <p>
         Tento formulář je dostupný pouze přes osobní odkaz,<br>
         který jsme vám zaslali e‑mailem. Otevřete prosím přihlášku<br>
-        přímo z e‑mailu, nebo nás kontaktujte na
+        přímo z e‑mailu.<br><br>
+        Nefunguje odkaz? Zavolejte nám na
+        <a href="tel:+420721964682" style="color:#c0392b;text-decoration:none;font-weight:600;">+420 721 964 682</a><br>
+        nebo napište na
         <a href="mailto:info@cervenapanda.com" style="color:#c0392b;text-decoration:none;">info@cervenapanda.com</a>.
       </p>
     </div>
@@ -717,13 +793,62 @@
         Děkujeme. Brzy vám zašleme fakturu na e-mail<br>
         spolu s informacemi o dalším postupu.
       </p>
+      <div class="done-next">
+        <div class="done-next-title">Přihlašujete další dítě?</div>
+        <p>
+          Tento odkaz je už použitý. Pro dalšího účastníka prosím otevřete
+          <strong>další přihlášku z e-mailu</strong> — každé dítě má tu svou.
+        </p>
+      </div>
+    </div>
+
+    <!-- ALREADY SUBMITTED (tento odkaz už byl použit) -->
+    <div class="done-notice" id="doneNotice">
+      <svg class="done-illu" viewBox="0 0 180 140" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Odeslaná přihláška">
+        <ellipse cx="90" cy="126" rx="56" ry="7" fill="#f0d0ce" opacity="0.45" />
+        <rect x="46" y="18" width="88" height="102" rx="9" fill="#fff" stroke="#e8d3d0" stroke-width="2" />
+        <rect x="70" y="10" width="40" height="16" rx="8" fill="#fdf0ef" stroke="#e8d3d0" stroke-width="2" />
+        <rect x="60" y="44" width="46" height="6" rx="3" fill="#f2dedb" />
+        <rect x="60" y="60" width="60" height="6" rx="3" fill="#f2dedb" />
+        <rect x="60" y="76" width="34" height="6" rx="3" fill="#f2dedb" />
+        <circle cx="120" cy="98" r="23" fill="#c0392b" />
+        <path d="M110 98.5l6.5 6.5L130 92" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+
+      <h2>Přihláška už je odeslaná</h2>
+      <p id="doneLead">
+        Tuto přihlášku jsme už od vás přijali. Odkaz z e-mailu platí<br>
+        pro jedno dítě, proto ho nelze použít znovu.
+      </p>
+
+      <!-- Naplní se z localStorage; skryté, pokud detaily nemáme -->
+      <div class="done-meta" id="doneMeta" hidden>
+        <span id="doneMetaStudent"></span>
+        <span id="doneMetaDate"></span>
+      </div>
+
+      <div class="done-next">
+        <div class="done-next-title">Přihlašujete další dítě?</div>
+        <p>
+          V e-mailu od nás najdete <strong>samostatný odkaz pro každé dítě</strong>.
+          Pro dalšího účastníka prosím otevřete <strong>další přihlášku z e-mailu</strong> —
+          každá vede na vlastní, prázdný formulář.
+        </p>
+      </div>
+
+      <p class="done-contact">
+        Potřebujete v odeslané přihlášce něco upravit nebo narazili jste na komplikaci?<br>
+        Zavolejte nám na <a href="tel:+420721964682">+420 721 964 682</a>
+        nebo napište na <a href="mailto:info@cervenapanda.com">info@cervenapanda.com</a>.
+      </p>
     </div>
   </div>
 
   <!-- FOOTER -->
   <p class="form-footer">
     Červená panda – přípravné kurzy, s.r.o. &nbsp;|&nbsp; Zahořanská 171, Beroun &nbsp;|&nbsp; IČO: 212 54 176<br>
-    <a href="mailto:info@cervenapanda.com" style="color:#c0392b;text-decoration:none;">info@cervenapanda.com</a>
+    <a href="tel:+420721964682" style="color:#c0392b;text-decoration:none;">+420 721 964 682</a>
+    &nbsp;|&nbsp; <a href="mailto:info@cervenapanda.com" style="color:#c0392b;text-decoration:none;">info@cervenapanda.com</a>
     &nbsp;|&nbsp; <a href="https://www.cervenapanda.com" style="color:#c0392b;text-decoration:none;">cervenapanda.com</a>
   </p>
 
@@ -737,11 +862,70 @@
   const TOKEN   = params.get("token")   || "";
   const POBOCKA = params.get("pobocka") || "";
 
+  // ── Ochrana proti dvojímu odeslání ──────────────────────────
+  // Token je v Google Sheets spárovaný s konkrétním řádkem, takže druhé
+  // odeslání stejného odkazu původní data přepíše. Po úspěšném odeslání si
+  // proto token poznamenáme do localStorage a formulář už znovu nenabídneme.
+  const STORAGE_KEY = "cervenapanda_odeslane_prihlasky_v1";
+
+  function readSubmitted() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch (err) {
+      return {}; // localStorage nedostupný (privátní režim apod.)
+    }
+  }
+
+  function markSubmitted(token, info) {
+    try {
+      const all = readSubmitted();
+      all[token] = info;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    } catch (err) {
+      /* Bez localStorage blokaci prostě neuložíme – odeslání tím neblokujeme. */
+    }
+  }
+
+  function showDoneNotice(info) {
+    document.querySelector(".intro").style.display = "none";
+    document.getElementById("prihlaskaForm").style.display = "none";
+    document.getElementById("successMsg").style.display = "none";
+
+    // Jméno držíme v 1. pádě ("Účastník: Tomáš Novák") – skloňovat ho neumíme
+    const name = info && info.student ? info.student : "";
+    let when = "";
+    if (info && info.sentAt) {
+      const d = new Date(info.sentAt);
+      if (!isNaN(d)) when = d.toLocaleDateString("cs-CZ", { day: "numeric", month: "long", year: "numeric" });
+    }
+
+    const meta = document.getElementById("doneMeta");
+    if (name) {
+      document.getElementById("doneMetaStudent").innerHTML = "Účastník: <strong>" + escapeHtml(name) + "</strong>";
+    }
+    if (when) {
+      document.getElementById("doneMetaDate").textContent = "Přijato " + when;
+    }
+    if (name || when) meta.hidden = false;
+
+    document.getElementById("doneNotice").style.display = "block";
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+  }
+
   // Brána: bez tokenu i pobočky je odkaz neplatný – formulář nezobrazujeme
   if (!TOKEN || !POBOCKA) {
     document.querySelector(".intro").style.display = "none";
     document.getElementById("prihlaskaForm").style.display = "none";
     document.getElementById("accessNotice").style.display = "block";
+  } else if (readSubmitted()[TOKEN]) {
+    // Tento odkaz už byl úspěšně odeslán z tohoto prohlížeče
+    showDoneNotice(readSubmitted()[TOKEN]);
   } else {
     // Předvyplnění města kurzu podle pobočky z URL – pole je uzamčené
     const courseCity = document.getElementById("courseCity");
@@ -904,6 +1088,14 @@
       });
       if (!res.ok) throw new Error("HTTP " + res.status);
 
+      // Až po potvrzeném úspěchu: token označíme jako použitý
+      markSubmitted(TOKEN, {
+        student: (data.studentFirstName + " " + data.studentLastName).trim(),
+        email:   data.email,
+        sentAt:  new Date().toISOString(),
+      });
+
+      document.querySelector(".intro").style.display = "none";
       document.getElementById("prihlaskaForm").style.display = "none";
       document.getElementById("successMsg").style.display = "block";
     } catch (err) {
