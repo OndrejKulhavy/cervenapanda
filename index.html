@@ -295,6 +295,7 @@
       cursor: pointer;
     }
     .consent-label .req { color: #c0392b; }
+    .consent-label a { color: #c0392b; font-weight: 600; }
 
     /* ── DIVIDER ─────────────────────────────────── */
     .divider {
@@ -718,13 +719,6 @@
             <li>Třetí fakturu (v březnu) uhradím do data splatnosti.</li>
           </ol>
         </div>
-        <div class="consent" style="margin-bottom:1rem;">
-          <input type="checkbox" id="paymentTerms" name="paymentTerms" required />
-          <label class="consent-label" for="paymentTerms">
-            Byl/a jsem seznámen/a s platebními podmínkami a souhlasím s nimi. <span class="req">*</span>
-          </label>
-        </div>
-
         <div class="infobox" style="margin-bottom:0.6rem;">
           <div class="infobox-title">Organizační podmínky</div>
           <p>
@@ -734,17 +728,22 @@
           </p>
         </div>
         <div class="consent" style="margin-bottom:1rem;">
-          <input type="checkbox" id="orgInfo" name="orgInfo" required />
-          <label class="consent-label" for="orgInfo">
-            Byl/a jsem seznámen/a s organizačními podmínkami a beru je na vědomí. <span class="req">*</span>
+          <input type="checkbox" id="termsAccepted" name="termsAccepted" required />
+          <label class="consent-label" for="termsAccepted">
+            Seznámil/a jsem se se <a id="termsLink" href="assets/vop-cervena-panda.pdf" target="_blank" rel="noopener">všeobecnými obchodními podmínkami</a>
+            poskytovatele <span id="termsProvider">Červená panda – přípravné kurzy, s.r.o.</span>, včetně platebních a organizačních
+            podmínek výše, a souhlasím s nimi. <span class="req">*</span>
           </label>
         </div>
 
         <div class="consent">
-          <input type="checkbox" id="gdpr" name="gdpr" required />
+          <input type="checkbox" id="gdpr" name="gdpr" />
           <label class="consent-label" for="gdpr">
-            Souhlasím se zpracováním osobních údajů za účelem realizace kurzu v souladu s GDPR.
-            Údaje jsou použity výhradně pro interní administrativu kurzů. <span class="req">*</span>
+            Souhlasím se zpracováním osobních údajů studenta (fotografie / videozáznamy) pro marketingové
+            účely poskytovatele (web, sociální sítě, reference) v souladu se
+            <a id="gdprLink" href="assets/gdpr-cervena-panda.pdf" target="_blank" rel="noopener">Zásadami ochrany osobních údajů</a>.
+            Tento souhlas je dobrovolný, není podmínkou účasti v kurzu a lze jej kdykoli odvolat.
+            <span class="opt">(nepovinné)</span>
           </label>
         </div>
       </div>
@@ -846,10 +845,12 @@
 
   <!-- FOOTER -->
   <p class="form-footer">
-    Červená panda – přípravné kurzy, s.r.o. &nbsp;|&nbsp; Zahořanská 171, Beroun &nbsp;|&nbsp; IČO: 212 54 176<br>
+    <span id="footerCompany">Červená panda – přípravné kurzy, s.r.o. &nbsp;|&nbsp; Zahořanská 171, Beroun &nbsp;|&nbsp; IČO: 212 54 176</span><br>
     <a href="tel:+420721964682" style="color:#c0392b;text-decoration:none;">+420 721 964 682</a>
     &nbsp;|&nbsp; <a href="mailto:info@cervenapanda.com" style="color:#c0392b;text-decoration:none;">info@cervenapanda.com</a>
-    &nbsp;|&nbsp; <a href="https://www.cervenapanda.com" style="color:#c0392b;text-decoration:none;">cervenapanda.com</a>
+    &nbsp;|&nbsp; <a href="https://www.cervenapanda.com" style="color:#c0392b;text-decoration:none;">cervenapanda.com</a><br>
+    <a id="footerVopLink" href="assets/vop-cervena-panda.pdf" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none;">Obchodní podmínky</a>
+    &nbsp;|&nbsp; <a id="footerGdprLink" href="assets/gdpr-cervena-panda.pdf" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none;">Ochrana osobních údajů</a>
   </p>
 
 </div>
@@ -959,6 +960,58 @@
     "Praha":   { days: ["Středa", "Čtvrtek"], time: "16:00–18:35" },
   };
 
+  // ── Poskytovatel podle města ──────────────────────────
+  // Příbram, Kladno, Praha → LMQ95 s.r.o.; Beroun, Plzeň → Červená panda – přípravné kurzy, s.r.o.
+  const LMQ_CITIES   = ["pribram", "kladno", "praha"];
+  const PANDA_CITIES = ["beroun", "plzen"];
+
+  const COMPANIES = {
+    lmq: {
+      name:    "LMQ95 s.r.o.",
+      address: "Příčná 1892/4, Nové Město, 110 00 Praha 1",
+      ico:     "24441104",
+      vop:     "assets/vop-lmq95.pdf",
+      gdpr:    "assets/gdpr-lmq95.pdf",
+    },
+    panda: {
+      name:    "Červená panda – přípravné kurzy, s.r.o.",
+      address: "Zahořanská 171, 266 01 Beroun",
+      ico:     "21254176",
+      vop:     "assets/vop-cervena-panda.pdf",
+      gdpr:    "assets/gdpr-cervena-panda.pdf",
+    },
+  };
+
+  let currentCompanyKey = "panda";
+
+  function normalizeCity(s) {
+    return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function companyForCity(city) {
+    const n = normalizeCity(city);
+    if (LMQ_CITIES.includes(n))   return "lmq";
+    if (PANDA_CITIES.includes(n)) return "panda";
+    return "panda"; // výchozí, než je město známo
+  }
+
+  function applyCompany(key) {
+    currentCompanyKey = key;
+    const c = COMPANIES[key];
+    const termsLink  = document.getElementById("termsLink");
+    const gdprLink   = document.getElementById("gdprLink");
+    const footVop    = document.getElementById("footerVopLink");
+    const footGdpr   = document.getElementById("footerGdprLink");
+    const provider   = document.getElementById("termsProvider");
+    const footerCo   = document.getElementById("footerCompany");
+    if (termsLink) termsLink.href = c.vop;
+    if (gdprLink)  gdprLink.href  = c.gdpr;
+    if (footVop)   footVop.href    = c.vop;
+    if (footGdpr)  footGdpr.href   = c.gdpr;
+    if (provider)  provider.textContent = c.name;
+    if (footerCo)  footerCo.innerHTML = c.name + " &nbsp;|&nbsp; " + c.address + " &nbsp;|&nbsp; IČO: " + c.ico;
+  }
+
   const dayGroup = document.getElementById("dayGroup");
 
   function renderDays(city) {
@@ -990,10 +1043,12 @@
 
   document.getElementById("courseCity").addEventListener("change", function () {
     renderDays(this.value);
+    applyCompany(companyForCity(this.value));
   });
 
   // Inicializace dnů podle předvyplněného města (z URL ?pobocka=)
   renderDays(document.getElementById("courseCity").value);
+  applyCompany(companyForCity(document.getElementById("courseCity").value));
 
   // ── Slevový kód: validace ───────────────────────────────
   const VALID_CODES   = ["F3TP3P3", "K0BM5M0"];
@@ -1076,6 +1131,12 @@
                            .map(i => i.value.trim()).filter(Boolean).join(", "),
       discountCode:      discountCode,
       discountValid:     discountCode ? VALID_CODES.includes(discountCode) : false,
+      termsAccepted:     document.getElementById("termsAccepted").checked,
+      gdpr:              document.getElementById("gdpr").checked,
+      company:           COMPANIES[currentCompanyKey].name,
+      companyIco:        COMPANIES[currentCompanyKey].ico,
+      vopDocument:       COMPANIES[currentCompanyKey].vop,
+      gdprDocument:      COMPANIES[currentCompanyKey].gdpr,
       token:             TOKEN,
       pobocka:           POBOCKA,
     };
