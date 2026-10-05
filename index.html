@@ -735,17 +735,6 @@
             podmínek výše, a souhlasím s nimi. <span class="req">*</span>
           </label>
         </div>
-
-        <div class="consent">
-          <input type="checkbox" id="gdpr" name="gdpr" />
-          <label class="consent-label" for="gdpr">
-            Souhlasím se zpracováním osobních údajů studenta (fotografie / videozáznamy) pro marketingové
-            účely poskytovatele (web, sociální sítě, reference) v souladu se
-            <a id="gdprLink" href="assets/gdpr-cervena-panda.pdf" target="_blank" rel="noopener">Zásadami ochrany osobních údajů</a>.
-            Tento souhlas je dobrovolný, není podmínkou účasti v kurzu a lze jej kdykoli odvolat.
-            <span class="opt">(nepovinné)</span>
-          </label>
-        </div>
       </div>
 
       <!-- ── SUBMIT ──────────────────────────────── -->
@@ -999,13 +988,11 @@
     currentCompanyKey = key;
     const c = COMPANIES[key];
     const termsLink  = document.getElementById("termsLink");
-    const gdprLink   = document.getElementById("gdprLink");
     const footVop    = document.getElementById("footerVopLink");
     const footGdpr   = document.getElementById("footerGdprLink");
     const provider   = document.getElementById("termsProvider");
     const footerCo   = document.getElementById("footerCompany");
     if (termsLink) termsLink.href = c.vop;
-    if (gdprLink)  gdprLink.href  = c.gdpr;
     if (footVop)   footVop.href    = c.vop;
     if (footGdpr)  footGdpr.href   = c.gdpr;
     if (provider)  provider.textContent = c.name;
@@ -1132,7 +1119,7 @@
       discountCode:      discountCode,
       discountValid:     discountCode ? VALID_CODES.includes(discountCode) : false,
       termsAccepted:     document.getElementById("termsAccepted").checked,
-      gdpr:              document.getElementById("gdpr").checked,
+      gdpr:              false, // GDPR checkbox removed – marketing consent not collected
       company:           COMPANIES[currentCompanyKey].name,
       companyIco:        COMPANIES[currentCompanyKey].ico,
       vopDocument:       COMPANIES[currentCompanyKey].vop,
